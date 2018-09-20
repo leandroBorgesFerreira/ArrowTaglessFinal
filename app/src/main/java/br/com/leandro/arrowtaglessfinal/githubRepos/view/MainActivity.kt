@@ -4,7 +4,8 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
-import arrow.effects.IO
+import arrow.effects.ForObservableK
+import arrow.effects.ObservableK
 import arrow.effects.async
 import arrow.effects.fix
 import arrow.effects.typeclasses.Async
@@ -23,6 +24,7 @@ import org.jetbrains.anko.yesButton
 class MainActivity : AppCompatActivity(), RepositoriesView {
 
     private val repoList : MutableList<Repository> = mutableListOf()
+    lateinit var presenter : RepositoryPresenter<ForObservableK>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,21 +32,30 @@ class MainActivity : AppCompatActivity(), RepositoriesView {
 
         setupList(repoList)
 
-        initPresenter(IO.async())
-            .drawRepositories()
-            .fix()
-            .unsafeRunAsync { }
-
-//        initPresenter(ObservableK.async())
+//        presenter = initPresenter(IO.async())
+//        presenter
 //            .drawRepositories()
 //            .fix()
-//            .observable
-//            .subscribe()
+//            .unsafeRunAsync { }
+
+        presenter = initPresenter(ObservableK.async())
+        presenter
+            .drawRepositories()
+            .fix()
+            .observable
+            .subscribe()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        presenter.onPause()
     }
 
     private fun <F> initPresenter(async: Async<F>) =
-        RepositoryUseCase(RepositoryDataSource(async, apiClient())) pipe { useCase ->
-            RepositoryPresenter(async, useCase, this)
+        RepositoryDataSource(async, apiClient()) pipe { dataSource ->
+            RepositoryUseCase(dataSource)
+        } pipe { useCase ->
+            RepositoryPresenter(useCase, this)
         }
 
     private fun setupList(listItems : List<Repository>) {
