@@ -4,8 +4,8 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
-import arrow.effects.ForObservableK
-import arrow.effects.ObservableK
+import arrow.effects.ForIO
+import arrow.effects.IO
 import arrow.effects.async
 import arrow.effects.fix
 import arrow.effects.typeclasses.Async
@@ -24,7 +24,7 @@ import org.jetbrains.anko.yesButton
 class MainActivity : AppCompatActivity(), RepositoriesView {
 
     private val repoList : MutableList<Repository> = mutableListOf()
-    lateinit var presenter : RepositoryPresenter<ForObservableK>
+    private lateinit var presenter : RepositoryPresenter<ForIO>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,18 +32,18 @@ class MainActivity : AppCompatActivity(), RepositoriesView {
 
         setupList(repoList)
 
-//        presenter = initPresenter(IO.async())
-//        presenter
-//            .drawRepositories()
-//            .fix()
-//            .unsafeRunAsync { }
-
-        presenter = initPresenter(ObservableK.async())
+        presenter = initPresenter(IO.async())
         presenter
             .drawRepositories()
             .fix()
-            .observable
-            .subscribe()
+            .unsafeRunAsync { }
+
+//        presenter = initPresenter(ObservableK.async())
+//        presenter
+//            .drawRepositories()
+//            .fix()
+//            .observable
+//            .subscribe()
     }
 
     override fun onPause() {
@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity(), RepositoriesView {
     }
 
     private fun <F> initPresenter(async: Async<F>) =
-        RepositoryDataSource(async, apiClient()) pipe { dataSource ->
+        RepositoryDataSource(apiClient(), async) pipe { dataSource ->
             RepositoryUseCase(dataSource)
         } pipe { useCase ->
             RepositoryPresenter(useCase, this)
@@ -60,37 +60,32 @@ class MainActivity : AppCompatActivity(), RepositoriesView {
 
     private fun setupList(listItems : List<Repository>) {
         repositoryListRV.layoutManager = LinearLayoutManager(this)
-        repositoryListRV.adapter = RepositoriesAdapter(listItems, { Log.d("Click", "Got a click!") })
+        repoList.addAll(listItems)
+        repositoryListRV.adapter = RepositoriesAdapter(repoList, { Log.d("Click", "Got a click!") })
     }
 
     override fun showNotFoundError() {
-        runOnUiThread {
-            alert("Not found!!") {
-                yesButton { }
-            }.show()
-        }
+        alert("Not found!!") {
+            yesButton { }
+        }.show()
     }
 
     override fun showGenericError() {
-        runOnUiThread {
-            alert("Generic error!!") {
-                yesButton { }
-            }.show()
-        }
+        alert("Generic error!!") {
+            yesButton { }
+        }.show()
+
     }
 
     override fun showAuthenticationError() {
-        runOnUiThread {
-            alert("Auth error!!") {
-                yesButton { }
-            }.show()
-        }
+        alert("Auth error!!") {
+            yesButton { }
+        }.show()
     }
 
-    override fun drawRepositories(heroes: List<Repository>) {
-        runOnUiThread {
-            repoList.addAll(heroes)
-            repositoryListRV.adapter.notifyDataSetChanged()
-        }
+    override fun drawRepositories(repositoryList: List<Repository>) {
+        repoList.clear()
+        repoList.addAll(repositoryList)
+        repositoryListRV.adapter.notifyDataSetChanged()
     }
 }
