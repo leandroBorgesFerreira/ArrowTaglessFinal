@@ -1,6 +1,7 @@
 package br.com.leandro.arrowtaglessfinal.retrofit
 
 import android.app.Application
+import arrow.integrations.retrofit.adapter.CallKindAdapterFactory
 import arrow.syntax.function.pipe
 import br.com.leandro.arrowtaglessfinal.BuildConfig
 import okhttp3.Cache
@@ -31,6 +32,7 @@ private fun getRetrofitBuilderDefaults() =
         Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(CallKindAdapterFactory.create())
 
 private fun provideOkHttpClientOAuth(cache: Cache) : OkHttpClient = httpClientBuilder().cache(cache).build()
 

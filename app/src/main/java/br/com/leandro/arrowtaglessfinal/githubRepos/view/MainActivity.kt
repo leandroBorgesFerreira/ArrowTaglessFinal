@@ -6,17 +6,17 @@ import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import arrow.effects.ForIO
 import arrow.effects.IO
-import arrow.effects.async
 import arrow.effects.fix
+import arrow.effects.instances.io.async.async
 import arrow.effects.typeclasses.Async
 import arrow.syntax.function.pipe
 import br.com.leandro.arrowtaglessfinal.R
 import br.com.leandro.arrowtaglessfinal.githubRepos.data.RepositoryDataSource
 import br.com.leandro.arrowtaglessfinal.githubRepos.data.RepositoryUseCase
+import br.com.leandro.arrowtaglessfinal.githubRepos.domain.Repository
 import br.com.leandro.arrowtaglessfinal.githubRepos.presentation.RepositoryPresenter
 import br.com.leandro.arrowtaglessfinal.githubRepos.view.adapter.RepositoriesAdapter
 import br.com.leandro.arrowtaglessfinal.retrofit.apiClient
-import br.com.leandro.arrowtry.githubrepos.domain.Repository
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.alert
 import org.jetbrains.anko.yesButton
@@ -38,12 +38,22 @@ class MainActivity : AppCompatActivity(), RepositoriesView {
             .fix()
             .unsafeRunAsync { }
 
-//        presenter = initPresenter(ObservableK.async())
+//        presenter = initPresenter(ObservableK)
 //        presenter
 //            .drawRepositories()
 //            .fix()
 //            .observable
 //            .subscribe()
+
+
+
+//        apiClient()
+//            .getRepositoriesObs("Java", "star", 1)
+//            .subscribeOn(Schedulers.io())
+//            .observeOn(AndroidSchedulers.mainThread())
+//            .subscribe { dto ->
+//                Log.d("Log!!", "Description: ${dto.items[0].description}")
+//            }
     }
 
     override fun onPause() {

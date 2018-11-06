@@ -25,9 +25,9 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    def arrow = "0.7.3"
+    def arrow = "0.8.0"
     def supportLibrary = "27.1.1"
-    def coroutinesVersion = "0.22.5"
+    def coroutinesVersion = "1.0.0"
     def ankoVersion = "0.10.5"
     def retrofitVersion = "2.4.0"
 
@@ -51,7 +51,9 @@ dependencies {
     implementation "io.arrow-kt:arrow-instances-core:$arrow"
     implementation "io.arrow-kt:arrow-instances-data:$arrow"
     implementation "io.arrow-kt:arrow-effects:$arrow"
+    implementation "io.arrow-kt:arrow-effects-instances:$arrow"
     implementation "io.arrow-kt:arrow-effects-rx2:$arrow"
+    implementation "io.arrow-kt:arrow-integration-retrofit-adapter:$arrow"
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
     kapt "io.arrow-kt:arrow-annotations-processor:$arrow"
 
@@ -60,13 +62,8 @@ dependencies {
 
     implementation "org.jetbrains.anko:anko-commons:$ankoVersion"
 
-    implementation "com.squareup.retrofit2:retrofit:${retrofitVersion}"
-    implementation "com.squareup.retrofit2:converter-gson:${retrofitVersion}"
+    implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
     implementation 'com.squareup.okhttp3:logging-interceptor:3.10.0'
 }
 
-kotlin {
-    experimental {
-        coroutines "warn"
-    }
-}
